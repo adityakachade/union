@@ -7,19 +7,24 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-// Check if .env file exists
-const envPath = path.join(__dirname, '.env');
-if (!fs.existsSync(envPath)) {
-  console.error('\n❌ ERROR: .env file not found!');
-  console.error('\n📝 Please create a .env file in the backend directory.');
-  console.error('   You can copy .env.example to .env and update it with your database credentials.');
-  console.error('\n💡 For free PostgreSQL database setup, see: DATABASE_SETUP.md');
-  console.error('\n   Quick setup:');
-  console.error('   1. cd backend');
-  console.error('   2. cp .env.example .env');
-  console.error('   3. Edit .env with your database credentials');
-  console.error('\n');
-  process.exit(1);
+// Check if .env file exists (only in development)
+// In production (Render, etc.), environment variables are set in the platform
+if (process.env.NODE_ENV !== 'production') {
+  const envPath = path.join(__dirname, '.env');
+  if (!fs.existsSync(envPath)) {
+    console.error('\n❌ ERROR: .env file not found!');
+    console.error('\n📝 Please create a .env file in the backend directory.');
+    console.error('   You can copy .env.example to .env and update it with your database credentials.');
+    console.error('\n💡 For free PostgreSQL database setup, see: DATABASE_SETUP.md');
+    console.error('\n   Quick setup:');
+    console.error('   1. cd backend');
+    console.error('   2. cp .env.example .env');
+    console.error('   3. Edit .env with your database credentials');
+    console.error('\n');
+    process.exit(1);
+  }
+} else {
+  console.log('🌍 Production mode: Using environment variables from platform');
 }
 
 const { sequelize } = require('./models');
