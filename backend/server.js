@@ -9,7 +9,14 @@ require('dotenv').config();
 
 // Check if .env file exists (only in development)
 // In production (Render, etc.), environment variables are set in the platform
-if (process.env.NODE_ENV !== 'production') {
+// Check if we're in production by looking for platform-specific env vars or NODE_ENV
+const isProduction = process.env.NODE_ENV === 'production' || 
+                      process.env.RENDER || 
+                      process.env.VERCEL ||
+                      process.env.HEROKU ||
+                      (process.env.DB_HOST && !process.env.DB_HOST.includes('localhost'));
+
+if (!isProduction) {
   const envPath = path.join(__dirname, '.env');
   if (!fs.existsSync(envPath)) {
     console.error('\n❌ ERROR: .env file not found!');
@@ -24,7 +31,12 @@ if (process.env.NODE_ENV !== 'production') {
     process.exit(1);
   }
 } else {
-  console.log('🌍 Production mode: Using environment variables from platform');
+  console.log('🌍 Production/Platform mode: Using environment variables from platform');
+  // Verify critical environment variables are set
+  if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_PASSWORD) {
+    console.error('\n⚠️  WARNING: Some database environment variables are missing!');
+    console.error('   Please ensure DB_HOST, DB_USER, and DB_PASSWORD are set in your platform.');
+  }
 }
 
 const { sequelize } = require('./models');
@@ -78,6 +90,7 @@ app.use((req, res) => {
   });
 });
 
+// Render provides PORT environment variable, default to 5000 for local dev
 const PORT = process.env.PORT || 5000;
 
 // Database connection and server start
