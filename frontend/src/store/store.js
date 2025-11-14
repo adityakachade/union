@@ -1,0 +1,15 @@
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from './slices/authSlice';
+import leadReducer from './slices/leadSlice';
+import notificationReducer from './slices/notificationSlice';
+import dashboardReducer from './slices/dashboardSlice';
+
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    leads: leadReducer,
+    notifications: notificationReducer,
+    dashboard: dashboardReducer
+  }
+});
+
